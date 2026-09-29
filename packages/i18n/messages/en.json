@@ -1,0 +1,49 @@
+{
+  "common": {
+    "appName": "Dayak",
+    "localeNames": { "hy": "Հայերեն", "ru": "Русский", "en": "English" },
+    "roleParent": "Parent",
+    "roleNanny": "Nanny",
+    "loading": "Loading…",
+    "verified": "Verified"
+  },
+  "nav": {
+    "findNanny": "Find a nanny",
+    "forNannies": "For nannies",
+    "login": "Log in",
+    "register": "Sign up",
+    "dashboard": "Dashboard"
+  },
+  "landing": {
+    "heroTitle": "Finding a nanny in Yerevan is easy. Trusting one is hard.",
+    "heroSubtitle": "Dayak connects parents in Yerevan with verified nannies — after an in-person interview, references, and document checks.",
+    "trust1": "interviewed in person",
+    "trust2": "2 checked references",
+    "trust3": "ID verified",
+    "trust4": "backup within 4 hours",
+    "ctaParent": "I'm looking for a nanny",
+    "ctaNanny": "I'm a nanny",
+    "howTitle": "How it works",
+    "howStep1Title": "Search the map",
+    "howStep1Body": "Browse verified nannies by district, language and child age.",
+    "howStep2Title": "Request an introduction",
+    "howStep2Body": "Send a request — our coordinator gets in touch with you.",
+    "howStep3Title": "Meet with confidence",
+    "howStep3Body": "The first meeting is free; you only pay after a successful match."
+  },
+  "auth": {
+    "loginTitle": "Log in to your account",
+    "registerTitle": "Create an account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "phone": "Phone",
+    "chooseRole": "I am a",
+    "submitLogin": "Log in",
+    "submitRegister": "Sign up",
+    "continueWithGoogle": "Continue with Google",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "invalidCredentials": "Invalid email or password"
+  }
+}

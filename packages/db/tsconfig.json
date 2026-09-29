@@ -1,0 +1,9 @@
+{
+  "extends": "@dayak/config/tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "prisma/**/*.ts"]
+}

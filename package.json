@@ -1,0 +1,30 @@
+{
+  "name": "dayak",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @dayak/web dev",
+    "build": "pnpm --filter @dayak/web build",
+    "start": "pnpm --filter @dayak/web start",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "test:e2e": "pnpm --filter @dayak/web test:e2e",
+    "i18n:check": "pnpm --filter @dayak/i18n check",
+    "db:generate": "pnpm --filter @dayak/db generate",
+    "db:migrate": "pnpm --filter @dayak/db migrate",
+    "db:push": "pnpm --filter @dayak/db push",
+    "db:seed": "pnpm --filter @dayak/db seed",
+    "db:up": "docker compose up -d postgres redis minio",
+    "db:down": "docker compose down",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.8"
+  }
+}

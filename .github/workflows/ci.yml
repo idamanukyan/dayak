@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: dayak
+          POSTGRES_PASSWORD: dayak
+          POSTGRES_DB: dayak
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dayak"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://dayak:dayak@localhost:5432/dayak
+      AUTH_SECRET: ci-test-secret-not-for-production-use-only
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: i18n key check
+        run: pnpm i18n:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Push schema
+        run: pnpm db:push
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @dayak/web exec playwright install --with-deps chromium
+
+      - name: Seed + E2E
+        run: |
+          pnpm db:seed
+          pnpm test:e2e

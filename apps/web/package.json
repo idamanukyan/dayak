@@ -1,0 +1,49 @@
+{
+  "name": "@dayak/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.7.4",
+    "@dayak/db": "workspace:*",
+    "@dayak/i18n": "workspace:*",
+    "@node-rs/argon2": "^2.0.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.462.0",
+    "next": "^15.1.0",
+    "next-auth": "5.0.0-beta.25",
+    "next-intl": "^3.26.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.5.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@dayak/config": "workspace:*",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.1.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

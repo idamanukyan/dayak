@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* "Warm & trustworthy" design tokens (HSL triplets — see design spec). */
+@layer base {
+  :root {
+    --background: 38 44% 96%;
+    --foreground: 26 9% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 26 9% 15%;
+    --primary: 130 19% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 19 52% 62%;
+    --secondary-foreground: 26 9% 15%;
+    --verified: 136 33% 36%;
+    --verified-foreground: 0 0% 100%;
+    --muted: 36 32% 91%;
+    --muted-foreground: 30 9% 38%;
+    --accent: 36 32% 91%;
+    --accent-foreground: 26 9% 15%;
+    --destructive: 10 59% 44%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 38 25% 85%;
+    --input: 38 25% 85%;
+    --ring: 130 19% 38%;
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+}

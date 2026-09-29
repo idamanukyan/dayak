@@ -1,0 +1,289 @@
+// Dayak data model — see docs/dayak-web-spec.md Section 3.
+// Rule: every admin view of a Document and every status change writes an AuditLog row.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PARENT
+  NANNY
+  ADMIN
+}
+
+enum Locale {
+  hy
+  ru
+  en
+}
+
+enum District {
+  KENTRON
+  ARABKIR
+  KANAKER_ZEYTUN
+  AJAPNYAK
+  DAVTASHEN
+  NOR_NORK
+  EREBUNI
+  SHENGAVIT
+  MALATIA_SEBASTIA
+  AVAN
+  NUBARASHEN
+  NORK_MARASH
+  OTHER
+}
+
+enum Schedule {
+  FULL_DAY
+  HALF_DAY
+  EVENINGS
+  WEEKENDS
+}
+
+enum Language {
+  HY
+  RU
+  EN
+}
+
+enum NannyStatus {
+  REGISTERED
+  INTERVIEW_IN_PROGRESS
+  INTERVIEW_DONE
+  DOCS_PENDING
+  UNDER_REVIEW
+  CHANGES_REQUESTED
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum DocType {
+  ID_FRONT
+  ID_BACK
+  SELFIE_WITH_ID
+  REFERENCE_LETTER
+  CERTIFICATE
+  OTHER
+}
+
+enum DocStatus {
+  UPLOADED
+  ACCEPTED
+  REJECTED
+}
+
+enum RequestStatus {
+  NEW
+  CONTACTED
+  INTRO_SCHEDULED
+  FEE_PENDING
+  FEE_PAID
+  TRIAL_SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED_BY_PARENT
+  CANCELLED_BY_NANNY
+  NO_MATCH
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String?  @unique
+  phone         String?  @unique // E.164, +374...
+  phoneVerified Boolean  @default(false)
+  passwordHash  String?
+  role          Role
+  locale        Locale   @default(hy)
+  telegramId    BigInt?  @unique
+  name          String
+  avatarKey     String? // S3 key
+  source        String? // ?src= on registration links / telegram deep links
+  parent        ParentProfile?
+  nanny         NannyProfile?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+}
+
+// --- Auth.js (v5) adapter models ---
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ParentProfile {
+  id         String         @id @default(cuid())
+  userId     String         @unique
+  user       User           @relation(fields: [userId], references: [id])
+  district   District
+  lat        Float?
+  lng        Float?
+  children   Json // [{ "ageMonths": 30 }, ...]
+  languages  Language[]
+  notes      String?
+  requests   MatchRequest[]
+  favourites Favourite[]
+}
+
+model NannyProfile {
+  id              String         @id @default(cuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id])
+  status          NannyStatus    @default(REGISTERED)
+  birthYear       Int?
+  district        District
+  lat             Float? // approximate; store jittered ±300 m for public map
+  lng             Float?
+  publicLat       Float?
+  publicLng       Float?
+  languages       Language[]
+  experienceYears Int?
+  ageGroups       String[] // ["0-1","1-3","3-6","6+"]
+  schedules       Schedule[]
+  rateHourAmd     Int?
+  rateMonthAmd    Int?
+  backupWilling   Boolean        @default(false)
+  bio             String? // written by nanny, max 600 chars
+  aiSummary       String? // generated, admin-visible only until VERIFIED; then a redacted public version
+  publicSummary   String? // 2–3 sentences, shown on card
+  aiScore         Int? // 0–100, admin-only, NEVER shown to nanny or parent
+  aiFlags         String[] // e.g. ["no_parent_reference","gap_in_history"]
+  verifiedAt      DateTime?
+  verifiedById    String?
+  rejectionReason String?
+  interviews      Interview[]
+  documents       Document[]
+  references      Reference[]
+  requests        MatchRequest[]
+  availability    Json? // { "mon": ["08:00-18:00"], ... }
+
+  @@index([status, district])
+}
+
+model Interview {
+  id              String       @id @default(cuid())
+  nannyId         String
+  nanny           NannyProfile @relation(fields: [nannyId], references: [id])
+  locale          Locale
+  startedAt       DateTime     @default(now())
+  completedAt     DateTime?
+  transcript      Json // [{ role: "assistant"|"user", content, ts }]
+  structured      Json? // tool-use output, see Section 5.4
+  model           String
+  langfuseTraceId String?
+}
+
+model Reference {
+  id          String       @id @default(cuid())
+  nannyId     String
+  nanny       NannyProfile @relation(fields: [nannyId], references: [id])
+  name        String
+  phone       String
+  relation    String // "parent_employer" | "other"
+  yearsKnown  Int?
+  checkedAt   DateTime?
+  checkedById String?
+  outcome     String? // "positive" | "negative" | "no_answer"
+  notes       String?
+}
+
+model Document {
+  id         String       @id @default(cuid())
+  nannyId    String
+  nanny      NannyProfile @relation(fields: [nannyId], references: [id])
+  type       DocType
+  s3Key      String // private bucket
+  mime       String
+  sizeBytes  Int
+  status     DocStatus    @default(UPLOADED)
+  reviewNote String?
+  uploadedAt DateTime     @default(now())
+}
+
+model MatchRequest {
+  id               String         @id @default(cuid())
+  parentId         String
+  parent           ParentProfile  @relation(fields: [parentId], references: [id])
+  nannyId          String? // null = "find me someone"
+  nanny            NannyProfile?  @relation(fields: [nannyId], references: [id])
+  status           RequestStatus  @default(NEW)
+  schedule         Schedule
+  startWhen        String // "this_week" | "2_weeks" | "month" | "browsing"
+  backupImportance String // "very" | "nice" | "no"
+  message          String?
+  feePaidAt        DateTime?
+  feeRef           String? // Idram transaction ref typed by admin
+  backupNannyId    String?
+  events           RequestEvent[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([status])
+}
+
+model RequestEvent {
+  id        String       @id @default(cuid())
+  requestId String
+  request   MatchRequest @relation(fields: [requestId], references: [id])
+  actorId   String?
+  type      String // "status_change" | "note" | "call" | "backup_assigned"
+  payload   Json
+  createdAt DateTime     @default(now())
+}
+
+model Favourite {
+  parentId  String
+  nannyId   String
+  parent    ParentProfile @relation(fields: [parentId], references: [id])
+  createdAt DateTime      @default(now())
+
+  @@id([parentId, nannyId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String // "nanny.verify", "document.view", ...
+  target    String
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([target])
+}

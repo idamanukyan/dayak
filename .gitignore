@@ -1,0 +1,38 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# next
+.next/
+out/
+next-env.d.ts
+
+# build
+dist/
+build/
+*.tsbuildinfo
+
+# env
+.env
+.env.local
+.env.*.local
+
+# prisma
+packages/db/prisma/*.db
+
+# test / coverage
+coverage/
+playwright-report/
+test-results/
+
+# os / editor
+.DS_Store
+*.log
+
+# python bot (legacy, keeps its own venv)
+dayak-kit/bot/.venv/
+dayak-kit/bot/__pycache__/
+dayak-kit/bot/data/*.csv
+
+# docker volumes
+.docker-data/

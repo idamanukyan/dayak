@@ -1,0 +1,24 @@
+{
+  "name": "@dayak/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "tsconfig.base.json",
+    "eslint.preset.js",
+    "tailwind.preset.ts"
+  ],
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./eslint": "./eslint.preset.js",
+    "./tailwind": "./tailwind.preset.ts"
+  },
+  "dependencies": {
+    "tailwindcss": "^3.4.15",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "typescript-eslint": "^8.16.0"
+  }
+}
