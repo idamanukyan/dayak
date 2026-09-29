@@ -36,3 +36,27 @@ Chronological log. Each entry: what was decided and why. See
   across seed and auth.
 - **Local dev runs on port 3100** — port 3000 is taken by another project on this
   machine. `PORT=3100 pnpm start`.
+
+## 2026-09-29 — Phase 2 (AI interview)
+
+- **Model: `claude-sonnet-5`** via `ANTHROPIC_MODEL` (spec said "claude-sonnet-4-5
+  or newer"; Sonnet is the right tier for a high-volume, cost-sensitive
+  conversational interview). Configurable per env.
+- **Provider abstraction with an offline mock.** `packages/ai` streams via the
+  Anthropic SDK when `ANTHROPIC_API_KEY` is set; otherwise a deterministic scripted
+  interviewer runs (`useMock()`), so dev, tests, and e2e work with no API key. Set
+  `DAYAK_AI_MOCK=1` to force the mock even with a key.
+- **Prompts live in `packages/ai/src/prompts.ts`** as per-locale string constants,
+  not loose `.md` files (spec's suggested path). Reason: reliable bundling in the
+  Next server runtime with no runtime `fs`/path tracing.
+- **finish handling runs inline** in the interview route (`processFinishedInterview`)
+  rather than a BullMQ worker. The worker is Phase 5; the function signature is
+  worker-ready so it moves without changes.
+- **Langfuse tracing is a dependency-free, no-op-by-default wrapper** — it posts a
+  trace via `fetch` only when `LANGFUSE_*` keys are set. A richer integration
+  (spans/generations) can replace it later.
+- **Hard navigation after interview completion.** The chat uses
+  `window.location` (not `router.push`) to return to the dashboard, because Next's
+  client Router Cache would otherwise serve a stale pre-interview dashboard.
+- **Interview turn: `thinking: disabled`, `max_tokens: 1024`** per turn to keep the
+  chat responsive and cap per-turn tokens (spec guardrail).

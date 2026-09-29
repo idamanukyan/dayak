@@ -28,16 +28,25 @@ test('nanny completes onboarding and reaches UNDER_REVIEW', async ({ page }) => 
   await page.getByRole('button', { name: 'Save profile' }).click();
   await expect(page.getByText('Profile saved')).toBeVisible({ timeout: 10000 });
 
-  // Interview placeholder: start then complete
+  // AI interview (mock) — seeds references and advances to DOCS_PENDING
   await page.goto('/en/nanny');
-  await page.getByRole('button', { name: 'Start interview' }).click();
-  await expect(page.getByRole('button', { name: 'Complete interview' })).toBeVisible({
-    timeout: 10000,
-  });
-  await page.getByRole('button', { name: 'Complete interview' }).click();
+  await page.getByRole('link', { name: 'Start interview' }).click();
+  const textarea = page.getByPlaceholder('Type your answer…');
+  await expect(textarea).toBeEnabled({ timeout: 15000 });
+  for (let i = 0; i < 10; i++) {
+    if (await page.getByText('Interview complete — thank you!').isVisible().catch(() => false)) break;
+    await textarea.fill(`Answer ${i} — honest and detailed.`);
+    await page.getByRole('button', { name: 'Send' }).click();
+    await Promise.race([
+      expect(textarea).toBeEnabled({ timeout: 15000 }),
+      expect(page.getByText('Interview complete — thank you!')).toBeVisible({ timeout: 15000 }),
+    ]).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  await expect(page).toHaveURL(/\/en\/nanny$/, { timeout: 10000 });
   await expect(page.getByText('Documents pending')).toBeVisible({ timeout: 10000 });
 
-  // Upload the 3 required documents
+  // Upload the 3 required documents → review gate met (interview seeded 2 references)
   await page.goto('/en/nanny/documents');
   const inputs = page.locator('input[type="file"]');
   for (let i = 0; i < 3; i++) {
@@ -48,16 +57,7 @@ test('nanny completes onboarding and reaches UNDER_REVIEW', async ({ page }) => 
     await resp;
   }
 
-  // Add two references
-  await page.goto('/en/nanny');
-  for (let i = 0; i < 2; i++) {
-    await page.getByLabel('Name').fill(`Ref ${i}`);
-    await page.getByLabel('Phone').fill('+37491000000');
-    await page.getByRole('button', { name: 'Add reference' }).click();
-    await expect(page.getByText(`Ref ${i}`)).toBeVisible({ timeout: 10000 });
-  }
-
   // Status should now be UNDER_REVIEW
-  await page.reload();
+  await page.goto('/en/nanny');
   await expect(page.getByText('Under review')).toBeVisible({ timeout: 10000 });
 });

@@ -4,8 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { prisma, District, Language, Schedule } from '@dayak/db';
 import { requireOrCreateNanny, requireNanny } from '@/lib/session';
-import { recomputeReviewGate, startInterview, completeInterviewPlaceholder } from '@/server/onboarding';
-import type { Locale } from '@dayak/i18n';
+import { recomputeReviewGate } from '@/server/onboarding';
 
 export type ActionState = { ok?: boolean; error?: string } | undefined;
 
@@ -103,16 +102,3 @@ export async function deleteReferenceAction(id: string): Promise<void> {
   revalidatePath('/[locale]/nanny', 'layout');
 }
 
-export async function startInterviewAction(): Promise<ActionState> {
-  const { nanny, actor } = await requireNanny();
-  await startInterview(nanny.id, actor.id);
-  revalidatePath('/[locale]/nanny', 'layout');
-  return { ok: true };
-}
-
-export async function completeInterviewAction(locale: Locale): Promise<ActionState> {
-  const { nanny, actor } = await requireNanny();
-  await completeInterviewPlaceholder(nanny.id, actor.id, locale);
-  revalidatePath('/[locale]/nanny', 'layout');
-  return { ok: true };
-}

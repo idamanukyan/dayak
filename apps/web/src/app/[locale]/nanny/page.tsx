@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Trash2, FileText, Pencil } from 'lucide-react';
+import { Trash2, FileText, Pencil, MessageSquare } from 'lucide-react';
 import { prisma, NannyStatus, DocType } from '@dayak/db';
 import { requireOrCreateNanny } from '@/lib/session';
 import { computeChecklist } from '@/lib/onboarding';
@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Stepper } from '@/components/nanny/stepper';
-import { InterviewStep } from '@/components/nanny/interview-step';
 import { AddReferenceForm } from '@/components/nanny/add-reference-form';
 import { deleteReferenceAction } from './actions';
 
@@ -102,11 +101,21 @@ export default async function NannyDashboard({ params }: { params: Promise<{ loc
         <CardHeader>
           <CardTitle>{t('steps.interview')}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-3">
           {interviewDone ? (
             <Badge variant="verified">{t('status.INTERVIEW_DONE')}</Badge>
           ) : (
-            <InterviewStep status={nanny.status} />
+            <>
+              <p className="text-sm text-muted-foreground">{t('interview.intro')}</p>
+              <Button asChild className="w-fit">
+                <Link href="/nanny/interview">
+                  <MessageSquare className="h-4 w-4" />
+                  {nanny.status === NannyStatus.INTERVIEW_IN_PROGRESS
+                    ? t('interview.resume')
+                    : t('interview.start')}
+                </Link>
+              </Button>
+            </>
           )}
         </CardContent>
       </Card>

@@ -1,6 +1,7 @@
 import 'server-only';
-import { prisma, NannyStatus, Locale } from '@dayak/db';
+import { prisma, NannyStatus, Locale, type Interview } from '@dayak/db';
 import { assertTransition, canTransition } from '@dayak/db/nannyStatus';
+import { DEFAULT_MODEL } from '@dayak/ai';
 import { meetsReviewGate } from '@/lib/onboarding';
 
 /** Persist a status change and write the required AuditLog row (spec Section 3 rule). */
@@ -24,36 +25,36 @@ async function changeStatus(
   ]);
 }
 
-/** Explicit: nanny starts the interview (REGISTERED -> INTERVIEW_IN_PROGRESS). */
-export async function startInterview(nannyId: string, actorId: string) {
-  const nanny = await prisma.nannyProfile.findUniqueOrThrow({ where: { id: nannyId } });
-  if (nanny.status !== NannyStatus.REGISTERED) return nanny.status;
-  await changeStatus(nannyId, nanny.status, NannyStatus.INTERVIEW_IN_PROGRESS, actorId);
-  return NannyStatus.INTERVIEW_IN_PROGRESS;
-}
-
 /**
- * Placeholder for Phase 2's real AI interview: records a completed Interview and
- * advances INTERVIEW_IN_PROGRESS -> INTERVIEW_DONE -> DOCS_PENDING. Phase 2
- * replaces the body with the streaming chat + finish_interview tool call.
+ * Resume the nanny's active interview or create one, moving REGISTERED ->
+ * INTERVIEW_IN_PROGRESS on first entry. Returns the interview to drive the chat.
  */
-export async function completeInterviewPlaceholder(
+export async function getOrCreateActiveInterview(
   nannyId: string,
   actorId: string,
   locale: Locale,
-) {
+): Promise<Interview> {
+  const nanny = await prisma.nannyProfile.findUniqueOrThrow({ where: { id: nannyId } });
+
+  if (nanny.status === NannyStatus.REGISTERED) {
+    await changeStatus(nannyId, nanny.status, NannyStatus.INTERVIEW_IN_PROGRESS, actorId);
+  }
+
+  const existing = await prisma.interview.findFirst({
+    where: { nannyId, completedAt: null },
+    orderBy: { startedAt: 'desc' },
+  });
+  if (existing) return existing;
+
+  return prisma.interview.create({
+    data: { nannyId, locale, model: DEFAULT_MODEL, transcript: [] },
+  });
+}
+
+/** On finish_interview: advance INTERVIEW_IN_PROGRESS -> INTERVIEW_DONE -> DOCS_PENDING. */
+export async function completeInterviewToDocs(nannyId: string, actorId: string) {
   const nanny = await prisma.nannyProfile.findUniqueOrThrow({ where: { id: nannyId } });
   if (nanny.status !== NannyStatus.INTERVIEW_IN_PROGRESS) return nanny.status;
-
-  await prisma.interview.create({
-    data: {
-      nannyId,
-      locale,
-      model: 'placeholder-phase1',
-      completedAt: new Date(),
-      transcript: [],
-    },
-  });
   await changeStatus(nannyId, nanny.status, NannyStatus.INTERVIEW_DONE, actorId);
   await changeStatus(nannyId, NannyStatus.INTERVIEW_DONE, NannyStatus.DOCS_PENDING, actorId);
   return NannyStatus.DOCS_PENDING;

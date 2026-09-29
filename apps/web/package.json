@@ -16,6 +16,7 @@
     "@aws-sdk/client-s3": "^3.700.0",
     "@aws-sdk/s3-request-presigner": "^3.700.0",
     "@auth/prisma-adapter": "^2.7.4",
+    "@dayak/ai": "workspace:*",
     "@dayak/db": "workspace:*",
     "@dayak/i18n": "workspace:*",
     "@node-rs/argon2": "^2.0.2",

@@ -133,8 +133,15 @@
     "interview": {
       "start": "Start interview",
       "resume": "Resume interview",
-      "complete": "Complete interview",
-      "placeholderNote": "The full AI interview arrives in the next release. For now this marks the step complete."
+      "intro": "A short chat interview (about 15–20 minutes) with Dayak's assistant. You can pause and resume any time — your answers are saved.",
+      "title": "AI interview",
+      "subtitle": "Answer honestly and take your time. A human coordinator reviews everything afterwards.",
+      "placeholder": "Type your answer…",
+      "send": "Send",
+      "sending": "Sending…",
+      "typing": "Interviewer is typing…",
+      "done": "Interview complete — thank you!",
+      "back": "Back to dashboard"
     }
   },
   "enums": {
