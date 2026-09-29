@@ -12,7 +12,8 @@
     "forNannies": "For nannies",
     "login": "Log in",
     "register": "Sign up",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "logout": "Log out"
   },
   "landing": {
     "heroTitle": "Finding a nanny in Yerevan is easy. Trusting one is hard.",
@@ -45,5 +46,129 @@
     "haveAccount": "Already have an account?",
     "noAccount": "Don't have an account?",
     "invalidCredentials": "Invalid email or password"
+  },
+  "nanny": {
+    "title": "Your onboarding",
+    "subtitle": "Complete these steps to become a verified nanny.",
+    "steps": {
+      "profile": "Profile",
+      "interview": "Interview",
+      "documents": "Documents",
+      "references": "References"
+    },
+    "done": "Done",
+    "todo": "To do",
+    "status": {
+      "REGISTERED": "Getting started",
+      "INTERVIEW_IN_PROGRESS": "Interview in progress",
+      "INTERVIEW_DONE": "Interview complete",
+      "DOCS_PENDING": "Documents pending",
+      "UNDER_REVIEW": "Under review",
+      "CHANGES_REQUESTED": "Changes requested",
+      "VERIFIED": "Verified",
+      "REJECTED": "Not approved",
+      "SUSPENDED": "Suspended"
+    },
+    "statusHelp": {
+      "REGISTERED": "Complete your profile, then start the interview.",
+      "INTERVIEW_IN_PROGRESS": "You can resume your interview any time — your answers are saved.",
+      "INTERVIEW_DONE": "Interview complete. Next, upload your documents.",
+      "DOCS_PENDING": "Upload the required documents and add two references.",
+      "UNDER_REVIEW": "Our coordinator will call you within 2 working days.",
+      "CHANGES_REQUESTED": "Please review the note below and re-submit.",
+      "VERIFIED": "You are verified. Your public card is live.",
+      "REJECTED": "Unfortunately your application was not approved.",
+      "SUSPENDED": "Your profile is temporarily suspended."
+    },
+    "profile": {
+      "title": "Profile basics",
+      "district": "District",
+      "birthYear": "Year of birth",
+      "experienceYears": "Years of experience",
+      "languages": "Languages",
+      "ageGroups": "Age groups",
+      "schedules": "Schedules",
+      "rateHour": "Rate per hour (AMD)",
+      "rateMonth": "Rate per month (AMD)",
+      "backupWilling": "I'm willing to be a same-day backup",
+      "bio": "About you",
+      "bioHint": "Up to 600 characters.",
+      "save": "Save profile",
+      "saved": "Profile saved",
+      "edit": "Edit profile"
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "ID images are private and seen only by Dayak staff.",
+      "required": "Required",
+      "optional": "Optional",
+      "choose": "Choose file",
+      "uploading": "Uploading…",
+      "uploaded": "Uploaded",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "replace": "Replace"
+    },
+    "docType": {
+      "ID_FRONT": "ID — front",
+      "ID_BACK": "ID — back",
+      "SELFIE_WITH_ID": "Selfie holding your ID",
+      "REFERENCE_LETTER": "Reference letter",
+      "CERTIFICATE": "Certificate",
+      "OTHER": "Other"
+    },
+    "references": {
+      "title": "References",
+      "subtitle": "Add at least two parents you worked for. We will call them.",
+      "name": "Name",
+      "phone": "Phone",
+      "relation": "Relationship",
+      "parentEmployer": "Parent you worked for",
+      "other": "Other",
+      "yearsKnown": "Years known",
+      "add": "Add reference",
+      "remove": "Remove",
+      "min": "At least two references are required."
+    },
+    "interview": {
+      "start": "Start interview",
+      "resume": "Resume interview",
+      "complete": "Complete interview",
+      "placeholderNote": "The full AI interview arrives in the next release. For now this marks the step complete."
+    }
+  },
+  "enums": {
+    "district": {
+      "KENTRON": "Kentron",
+      "ARABKIR": "Arabkir",
+      "KANAKER_ZEYTUN": "Kanaker-Zeytun",
+      "AJAPNYAK": "Ajapnyak",
+      "DAVTASHEN": "Davtashen",
+      "NOR_NORK": "Nor Nork",
+      "EREBUNI": "Erebuni",
+      "SHENGAVIT": "Shengavit",
+      "MALATIA_SEBASTIA": "Malatia-Sebastia",
+      "AVAN": "Avan",
+      "NUBARASHEN": "Nubarashen",
+      "NORK_MARASH": "Nork-Marash",
+      "OTHER": "Other"
+    },
+    "language": {
+      "HY": "Armenian",
+      "RU": "Russian",
+      "EN": "English"
+    },
+    "schedule": {
+      "FULL_DAY": "Full day",
+      "HALF_DAY": "Half day",
+      "EVENINGS": "Evenings",
+      "WEEKENDS": "Weekends"
+    },
+    "ageGroup": {
+      "0-1": "0–1",
+      "1-3": "1–3",
+      "3-6": "3–6",
+      "6+": "6+"
+    }
   }
 }

@@ -4,7 +4,11 @@ import { hash } from '@node-rs/argon2';
 import { z } from 'zod';
 import { AuthError } from 'next-auth';
 import { prisma, Role, Locale } from '@dayak/db';
-import { signIn } from '@/auth';
+import { signIn, signOut } from '@/auth';
+
+export async function logoutAction() {
+  await signOut({ redirectTo: '/' });
+}
 
 const ARGON = { memoryCost: 19456, timeCost: 2, parallelism: 1 };
 
