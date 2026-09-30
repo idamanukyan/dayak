@@ -84,3 +84,27 @@ Chronological log. Each entry: what was decided and why. See
   sets `rejectionReason` to the fixed category only (free-text note stays admin-only).
 - **Notifications on verify are deferred to Phase 5** (worker) — verify just does the
   status/publish/audit now.
+
+## 2026-09-30 — Phase 4 (parent search + map)
+
+- **MapLibre with an inline OSM raster style** (no vector tiles / glyph server).
+  Clusters + points are circle layers only (no text labels) so no glyph URL is
+  needed; popups are HTML. `NEXT_PUBLIC_MAP_STYLE` is unused for now — the style is
+  built in-component. Map imports `maplibre-gl` dynamically inside `useEffect` to
+  avoid SSR `window` issues, and a `ResizeObserver` calls `map.resize()` for the
+  mobile list/map toggle.
+- **Phone/surname reveal is data-level, not UI-level** (spec acceptance): the public
+  `getPublicNannyProfile` and `GET /api/nannies/[id]` only include a `contact`
+  object (fullName + phone) when the requesting parent has a FEE_PAID+ request with
+  that nanny (via `policy.canParentSeeNannyContact`). The phone field is absent from
+  the payload entirely otherwise.
+- **`lib/nanny-search.ts` is pure/client-safe** (firstName, ageRange, parseFilters,
+  distanceSq) so filters run on the client and helpers are unit-tested; the DB query
+  lives in `server/nannies.ts`. Distance sort is done in JS from district centroids.
+- **Age shown as a band** ("40s") derived from birthYear server-side — exact birth
+  year is never sent to the client.
+- **Favourite has no `nanny` relation** in the schema, so the dashboard resolves
+  favourite nannies with a second query rather than an include.
+- **Seed: verified nannies now have phones** (so the FEE_PAID reveal shows a real
+  number).
+- **Admin login now routes to `/admin`; nanny to `/nanny`; parent to `/dashboard`.**

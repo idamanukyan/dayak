@@ -92,6 +92,7 @@ async function main() {
         name: n.name,
         role: Role.NANNY,
         locale: n.locale,
+        phone: `+3749${String(100000 + i).slice(0, 6)}`,
         passwordHash: await hash('nanny1234', ARGON),
         nanny: {
           create: {

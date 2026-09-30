@@ -1,4 +1,4 @@
-import { prisma, Role, District, type NannyProfile } from '@dayak/db';
+import { prisma, Role, District, type NannyProfile, type ParentProfile } from '@dayak/db';
 import type { Actor } from '@dayak/db/policy';
 import { auth } from '@/auth';
 
@@ -46,4 +46,17 @@ export async function requireOrCreateNanny(): Promise<{ actor: Actor; nanny: Nan
     create: { userId: actor.id, district: District.OTHER },
   });
   return { actor, nanny };
+}
+
+/** Require a PARENT and return actor + their profile, creating a bare one on first use. */
+export async function requireOrCreateParent(): Promise<{ actor: Actor; parent: ParentProfile }> {
+  const actor = await getActor();
+  if (!actor || actor.role !== Role.PARENT) throw new UnauthorizedError();
+
+  const parent = await prisma.parentProfile.upsert({
+    where: { userId: actor.id },
+    update: {},
+    create: { userId: actor.id, district: District.OTHER, children: [], languages: [] },
+  });
+  return { actor, parent };
 }

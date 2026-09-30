@@ -28,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.462.0",
+    "maplibre-gl": "^4.7.1",
     "next": "^15.1.0",
     "next-auth": "5.0.0-beta.25",
     "next-intl": "^3.26.0",

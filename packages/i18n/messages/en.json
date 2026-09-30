@@ -177,5 +177,103 @@
       "3-6": "3–6",
       "6+": "6+"
     }
+  },
+  "search": {
+    "title": "Verified nannies",
+    "filters": "Filters",
+    "district": "District",
+    "schedule": "Schedule",
+    "language": "Language",
+    "ageGroup": "Child age",
+    "backupWilling": "Backup-willing only",
+    "rateMin": "Min ֏/hr",
+    "rateMax": "Max ֏/hr",
+    "apply": "Apply",
+    "clear": "Clear",
+    "any": "Any",
+    "results": "{count} verified {count, plural, one {nanny} other {nannies}}",
+    "noResults": "No nannies match these filters yet.",
+    "mapView": "Map",
+    "listView": "List",
+    "sortedByDistance": "Closest to your district first"
+  },
+  "card": {
+    "experience": "{years} yrs experience",
+    "viewProfile": "View profile",
+    "perMonth": "/mo",
+    "perHour": "/hr"
+  },
+  "publicProfile": {
+    "back": "Back to search",
+    "requestIntro": "Request introduction",
+    "findSomeone": "Or: find me someone",
+    "about": "About",
+    "details": "Details",
+    "experience": "Experience",
+    "languages": "Languages",
+    "schedules": "Schedules",
+    "rate": "Rate",
+    "feeNotice": "A 5,000 ֏ matching fee applies before the first trial day — you only pay after a successful match. The first meeting is free.",
+    "contactHidden": "Phone and full name unlock after the matching fee is paid.",
+    "phone": "Phone",
+    "fullName": "Full name",
+    "save": "Save",
+    "saved": "Saved",
+    "suspended": "This nanny is temporarily unavailable."
+  },
+  "request": {
+    "title": "Request an introduction",
+    "schedule": "Schedule you need",
+    "startWhen": "When do you need to start?",
+    "backupImportance": "How important is same-day backup?",
+    "message": "Message (optional)",
+    "send": "Send request",
+    "sending": "Sending…",
+    "sent": "Request sent! Track it on your dashboard.",
+    "loginRequired": "Please log in as a parent to request an introduction.",
+    "start": {
+      "this_week": "This week",
+      "2_weeks": "In 2 weeks",
+      "month": "Within a month",
+      "browsing": "Just browsing"
+    },
+    "backup": {
+      "very": "Very important",
+      "nice": "Nice to have",
+      "no": "Not important"
+    }
+  },
+  "parent": {
+    "dashboardTitle": "Your dashboard",
+    "myRequests": "Your requests",
+    "favourites": "Saved nannies",
+    "noRequests": "No requests yet. Browse verified nannies to get started.",
+    "noFavourites": "No saved nannies yet.",
+    "findNannies": "Find nannies",
+    "feePending": "Pay the 5,000 ֏ matching fee via Idram to unlock contact details.",
+    "idram": "Idram: send 5,000 ֏ to 0000-0000 with your name, then our coordinator confirms.",
+    "contactUnlocked": "Contact unlocked",
+    "profileTitle": "Your profile",
+    "editProfile": "Edit profile",
+    "saveProfile": "Save profile",
+    "saved": "Saved",
+    "district": "Your district",
+    "languages": "Languages you speak",
+    "childrenAges": "Children's ages (months, comma-separated)",
+    "findSomeoneTitle": "Can't decide? Let us match you",
+    "findSomeoneCta": "Find me someone"
+  },
+  "requestStatus": {
+    "NEW": "New",
+    "CONTACTED": "Contacted",
+    "INTRO_SCHEDULED": "Intro scheduled",
+    "FEE_PENDING": "Fee pending",
+    "FEE_PAID": "Fee paid",
+    "TRIAL_SCHEDULED": "Trial scheduled",
+    "ACTIVE": "Active",
+    "COMPLETED": "Completed",
+    "CANCELLED_BY_PARENT": "Cancelled by you",
+    "CANCELLED_BY_NANNY": "Cancelled by nanny",
+    "NO_MATCH": "No match"
   }
 }
