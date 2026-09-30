@@ -58,6 +58,19 @@ pnpm test:e2e     # playwright golden paths (needs app + db running)
 | redis | 6379 |
 | minio API / console | 9000 / 9001 |
 
+## Telegram bot (apps/bot)
+
+```bash
+# Needs a bot token from @BotFather in .env: TELEGRAM_BOT_TOKEN=...
+# Optional admin group notifications: TELEGRAM_ADMIN_CHAT_ID=... (use /id in the bot)
+pnpm --filter @dayak/bot start   # long-polling; no-ops with a friendly message if no token
+```
+
+Without `TELEGRAM_BOT_TOKEN` / `RESEND_API_KEY`, notifications and the bot fall back to
+console logging (dev). Emails send via Resend when `RESEND_API_KEY` is set; Telegram
+messages send when `TELEGRAM_BOT_TOKEN` is set and the recipient has a linked
+`telegramId` (or for the admin group when `TELEGRAM_ADMIN_CHAT_ID` is set).
+
 ## Deploy / rollback / secrets / restore
 
 _To be completed in Phase 6 (Hetzner + Caddy, `compose.prod.yml`, nightly

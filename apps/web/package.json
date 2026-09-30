@@ -19,6 +19,7 @@
     "@dayak/ai": "workspace:*",
     "@dayak/db": "workspace:*",
     "@dayak/i18n": "workspace:*",
+    "@dayak/notifications": "workspace:*",
     "@node-rs/argon2": "^2.0.2",
     "file-type": "^19.6.0",
     "sharp": "^0.33.5",

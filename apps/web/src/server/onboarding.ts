@@ -2,6 +2,7 @@ import 'server-only';
 import { prisma, NannyStatus, Locale, type Interview } from '@dayak/db';
 import { assertTransition, canTransition } from '@dayak/db/nannyStatus';
 import { DEFAULT_MODEL } from '@dayak/ai';
+import { notifyNannyUnderReview } from '@dayak/notifications';
 import { meetsReviewGate } from '@/lib/onboarding';
 
 /** Persist a status change and write the required AuditLog row (spec Section 3 rule). */
@@ -79,6 +80,7 @@ export async function recomputeReviewGate(nannyId: string, actorId: string | nul
 
   if (meetsReviewGate(docTypes, referenceCount) && canTransition(nanny.status, NannyStatus.UNDER_REVIEW)) {
     await changeStatus(nannyId, nanny.status, NannyStatus.UNDER_REVIEW, actorId);
+    await notifyNannyUnderReview(nannyId); // admin group
     return NannyStatus.UNDER_REVIEW;
   }
   return nanny.status;

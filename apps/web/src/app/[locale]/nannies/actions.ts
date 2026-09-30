@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { prisma, Schedule, RequestStatus } from '@dayak/db';
+import { notifyNewRequest } from '@dayak/notifications';
 import { requireOrCreateParent, UnauthorizedError } from '@/lib/session';
 
 export type RequestActionState = { ok?: boolean; error?: string } | undefined;
@@ -52,7 +53,7 @@ export async function createMatchRequestAction(
   await prisma.requestEvent.create({
     data: { requestId: created.id, actorId: parentId, type: 'status_change', payload: { to: RequestStatus.NEW } },
   });
-  // Admin notification is sent by the Phase 5 worker.
+  await notifyNewRequest(created.id); // admin group
 
   revalidatePath('/[locale]/dashboard', 'layout');
   return { ok: true };

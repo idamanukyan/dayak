@@ -1,5 +1,6 @@
 import 'server-only';
 import { prisma, RequestStatus } from '@dayak/db';
+import { notifyRequestStatusParent } from '@dayak/notifications';
 
 /** Move a match request to a new status and log the transition. */
 export async function setRequestStatus(requestId: string, adminId: string, status: RequestStatus) {
@@ -15,6 +16,7 @@ export async function setRequestStatus(requestId: string, adminId: string, statu
       },
     }),
   ]);
+  await notifyRequestStatusParent(requestId, status);
 }
 
 /** Mark the 5,000 AMD matching fee paid (admin types the Idram reference). */
@@ -28,6 +30,7 @@ export async function markFeePaid(requestId: string, adminId: string, feeRef: st
       data: { requestId, actorId: adminId, type: 'status_change', payload: { to: RequestStatus.FEE_PAID, feeRef } },
     }),
   ]);
+  await notifyRequestStatusParent(requestId, RequestStatus.FEE_PAID);
 }
 
 /** Assign a same-day backup nanny; the event timestamp drives the "backup within 4h" metric. */

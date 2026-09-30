@@ -108,3 +108,24 @@ Chronological log. Each entry: what was decided and why. See
 - **Seed: verified nannies now have phones** (so the FEE_PAID reveal shows a real
   number).
 - **Admin login now routes to `/admin`; nanny to `/nanny`; parent to `/dashboard`.**
+
+## 2026-09-30 — Phase 5 (notifications + Telegram bot)
+
+- **Notifications live in `packages/notifications`** (not `packages/db/src/notifications.ts`
+  as the spec suggested) — keeps the DB package free of network concerns. Table-driven
+  templates per event × locale; dispatch via **Resend REST** (email) and **Telegram
+  sendMessage** (fetch, no SDK), each with a **console fallback in dev** so it works
+  with no keys. Recipients/channels resolved from the DB per event.
+- **Inline dispatch, not a BullMQ worker.** Spec Section 2 lists BullMQ for
+  notifications; we call `notify*` inline from the server actions (verify, request
+  changes/reject, new request, request status, under-review). Meets the Phase 5
+  acceptance; a worker can wrap these later for retries/scale (`apps/worker` deferred).
+- **Magic-link login** via a dedicated `magic` Credentials provider + one-time
+  `VerificationToken` (`packages/db/src/magic.ts`: `createMagicToken`/`consumeMagicToken`,
+  15-min TTL, single-use). The bot mints the token; `/[locale]/auth/magic` consumes it.
+- **grammY bot in `apps/bot`** with a testable `logic.ts` (onboard, browse request,
+  magic link, `parseSource`) separate from the grammY wiring. `/start` deep-link
+  `src_*` → `User.source`; parent flow creates a NEW find-me-someone request + admin
+  notification; nanny flow creates REGISTERED + interview magic link; `/id` for admins.
+  Entry no-ops without `TELEGRAM_BOT_TOKEN`. Legacy Python bot in `dayak-kit/` is now
+  superseded (left in place; not run).

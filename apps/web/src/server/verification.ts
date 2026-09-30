@@ -7,6 +7,7 @@ import {
   type ChangeReason,
   type RejectReason,
 } from '@/lib/verification';
+import { notifyNannyVerified, notifyNannyStatus } from '@dayak/notifications';
 import { DISTRICT_CENTROIDS, jitterCoord } from '@/lib/districts';
 
 export class VerifyBlockedError extends Error {
@@ -115,7 +116,7 @@ export async function verifyNanny(nannyId: string, adminId: string, meetingDate:
       },
     }),
   ]);
-  // Notification (email + Telegram) is sent by the Phase 5 worker.
+  await notifyNannyVerified(nannyId);
 }
 
 export async function requestChanges(
@@ -129,6 +130,7 @@ export async function requestChanges(
     reasons,
     note: note ?? null,
   });
+  await notifyNannyStatus(nannyId, 'changes_requested');
 }
 
 export async function rejectNanny(
@@ -153,6 +155,7 @@ export async function rejectNanny(
       },
     }),
   ]);
+  await notifyNannyStatus(nannyId, 'rejected');
 }
 
 export async function setSuspended(nannyId: string, adminId: string, suspend: boolean) {

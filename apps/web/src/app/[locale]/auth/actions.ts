@@ -79,6 +79,17 @@ const loginSchema = z.object({
   locale: z.enum([Locale.hy, Locale.ru, Locale.en]),
 });
 
+export async function magicLoginAction(token: string, to: string): Promise<RegisterState> {
+  const dest = to.startsWith('/') ? to : '/';
+  try {
+    await signIn('magic', { token, redirectTo: dest });
+  } catch (err) {
+    if (err instanceof AuthError) return { error: 'invalid_token' };
+    throw err;
+  }
+  return undefined;
+}
+
 export async function loginAction(
   _prev: RegisterState,
   formData: FormData,

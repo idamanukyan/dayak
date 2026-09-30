@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./policy": "./src/policy.ts",
     "./serializers": "./src/serializers.ts",
-    "./nannyStatus": "./src/nannyStatus.ts"
+    "./nannyStatus": "./src/nannyStatus.ts",
+    "./magic": "./src/magic.ts"
   },
   "scripts": {
     "generate": "prisma generate",

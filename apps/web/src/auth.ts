@@ -5,6 +5,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { verify } from '@node-rs/argon2';
 import { z } from 'zod';
 import { prisma, Role } from '@dayak/db';
+import { consumeMagicToken } from '@dayak/db/magic';
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -41,6 +42,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           role: user.role,
         };
+      },
+    }),
+    Credentials({
+      id: 'magic',
+      name: 'Magic link',
+      credentials: { token: {} },
+      async authorize(raw) {
+        const token = typeof raw?.token === 'string' ? raw.token : null;
+        if (!token) return null;
+        const userId = await consumeMagicToken(token);
+        if (!userId) return null;
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) return null;
+        return { id: user.id, name: user.name, email: user.email, role: user.role };
       },
     }),
     ...(googleEnabled
