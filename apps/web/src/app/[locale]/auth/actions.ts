@@ -91,9 +91,14 @@ export async function loginAction(
   if (!parsed.success) return { error: 'invalid' };
   const { email, password, locale } = parsed.data;
 
-  // Route to the right home by role (admin has no dedicated UI until Phase 3).
+  // Route to the right home by role.
   const user = await prisma.user.findUnique({ where: { email }, select: { role: true } });
-  const dest = user?.role === Role.NANNY ? `/${locale}/nanny` : `/${locale}/dashboard`;
+  const dest =
+    user?.role === Role.ADMIN
+      ? `/${locale}/admin`
+      : user?.role === Role.NANNY
+        ? `/${locale}/nanny`
+        : `/${locale}/dashboard`;
 
   try {
     await signIn('credentials', { email, password, redirectTo: dest });
