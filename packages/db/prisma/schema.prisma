@@ -160,6 +160,8 @@ model ParentProfile {
   notes      String?
   requests   MatchRequest[]
   favourites Favourite[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 }
 
 model NannyProfile {
@@ -193,6 +195,8 @@ model NannyProfile {
   references      Reference[]
   requests        MatchRequest[]
   availability    Json? // { "mon": ["08:00-18:00"], ... }
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@index([status, district])
 }

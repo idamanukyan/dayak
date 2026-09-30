@@ -91,8 +91,12 @@ export async function loginAction(
   if (!parsed.success) return { error: 'invalid' };
   const { email, password, locale } = parsed.data;
 
+  // Route to the right home by role (admin has no dedicated UI until Phase 3).
+  const user = await prisma.user.findUnique({ where: { email }, select: { role: true } });
+  const dest = user?.role === Role.NANNY ? `/${locale}/nanny` : `/${locale}/dashboard`;
+
   try {
-    await signIn('credentials', { email, password, redirectTo: `/${locale}/dashboard` });
+    await signIn('credentials', { email, password, redirectTo: dest });
   } catch (err) {
     if (err instanceof AuthError) return { error: 'invalid_credentials' };
     throw err;

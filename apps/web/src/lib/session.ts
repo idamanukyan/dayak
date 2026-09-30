@@ -27,6 +27,13 @@ export async function requireNanny(): Promise<{ actor: Actor; nanny: NannyProfil
   return { actor, nanny };
 }
 
+/** Require an authenticated ADMIN. Throws UnauthorizedError otherwise. */
+export async function requireAdmin(): Promise<Actor> {
+  const actor = await getActor();
+  if (!actor || actor.role !== Role.ADMIN) throw new UnauthorizedError();
+  return actor;
+}
+
 /** Require the nanny profile OR create it if this user is a NANNY without one yet. */
 export async function requireOrCreateNanny(): Promise<{ actor: Actor; nanny: NannyProfile }> {
   const actor = await getActor();

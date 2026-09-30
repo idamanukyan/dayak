@@ -60,3 +60,27 @@ Chronological log. Each entry: what was decided and why. See
   client Router Cache would otherwise serve a stale pre-interview dashboard.
 - **Interview turn: `thinking: disabled`, `max_tokens: 1024`** per turn to keep the
   chat responsive and cap per-turn tokens (spec guardrail).
+
+## 2026-09-30 — Phase 3 (admin)
+
+- **Admin lives at `/[locale]/admin` (link as `/en/admin`), English-only** — not at
+  a locale-less `/admin`. Reason: the root `<html>` is in the next-intl `[locale]`
+  layout; a locale-less route would need a root-layout restructure. Admin UI text is
+  hardcoded English (spec 6 "UI in en"); data shown in original language.
+- **Added `createdAt`/`updatedAt` to `NannyProfile` and `ParentProfile`** — the spec
+  intro says every model has them though the explicit blocks omitted them. Enables
+  the queue's "UNDER_REVIEW age" sort. Required a dev DB `--force-reset` + reseed.
+- **In-person meeting date is a required input to the Verify action**, recorded in
+  the `nanny.verify` audit meta — not a new schema column. Satisfies the spec 5.4
+  "meeting date entered" precondition without extending the data model.
+- **Verify preconditions live in a pure, client-safe `lib/verification.ts`**
+  (`verificationBlockReason`, no `@dayak/db` import — doc types compared as string
+  literals) so the reason lists can reach client components and the gate is unit-tested.
+- **Public map coords jittered at verification** (`lib/districts.ts`, ±300 m) from the
+  nanny's lat/lng or her district centroid — set on the VERIFIED transition (spec 11.3).
+- **Every `/api/admin/documents/[id]/url` call writes a `document.view` audit row**
+  (both thumb and full variants); non-admin → 403.
+- **Change-request/reject reasons stored in audit meta**, not a schema field. Reject
+  sets `rejectionReason` to the fixed category only (free-text note stays admin-only).
+- **Notifications on verify are deferred to Phase 5** (worker) — verify just does the
+  status/publish/audit now.
