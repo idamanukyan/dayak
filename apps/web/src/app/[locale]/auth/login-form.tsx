@@ -28,7 +28,11 @@ export function LoginForm({ locale }: { locale: Locale }) {
         <Input id="password" name="password" type="password" required autoComplete="current-password" />
       </div>
 
-      {state?.error && <p className="text-sm text-destructive">{t('invalidCredentials')}</p>}
+      {state?.error && (
+        <p className="text-sm text-destructive">
+          {state.error === 'rate_limited' ? t('tooManyAttempts') : t('invalidCredentials')}
+        </p>
+      )}
 
       <Button type="submit" disabled={pending} className="mt-2">
         {pending ? tc('loading') : t('submitLogin')}

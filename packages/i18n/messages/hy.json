@@ -45,7 +45,8 @@
     "continueWithGoogle": "Շարունակել Google-ով",
     "haveAccount": "Արդեն ունե՞ք հաշիվ",
     "noAccount": "Հաշիվ չունե՞ք",
-    "invalidCredentials": "Սխալ էլ. փոստ կամ գաղտնաբառ"
+    "invalidCredentials": "Սխալ էլ. փոստ կամ գաղտնաբառ",
+    "tooManyAttempts": "Չափազանց շատ փորձեր։ Սպասեք մի քանի րոպե և կրկին փորձեք։"
   },
   "nanny": {
     "title": "Ձեր գրանցումը",

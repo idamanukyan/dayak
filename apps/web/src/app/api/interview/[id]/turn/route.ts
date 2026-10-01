@@ -10,6 +10,7 @@ import {
 } from '@dayak/ai';
 import { requireNanny, UnauthorizedError } from '@/lib/session';
 import { completeInterviewToDocs } from '@/server/onboarding';
+import { rateLimit, LIMITS } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   } catch (e) {
     if (e instanceof UnauthorizedError) return new Response('forbidden', { status: 403 });
     throw e;
+  }
+
+  // Rate limit: 60 interview turns / hour per nanny (spec 11.7).
+  const rl = rateLimit(`interview:${nannyId}`, LIMITS.interviewTurn.limit, LIMITS.interviewTurn.windowMs);
+  if (!rl.ok) {
+    return new Response('rate_limited', {
+      status: 429,
+      headers: { 'retry-after': String(rl.retryAfterSec) },
+    });
   }
 
   const interview = await prisma.interview.findUnique({ where: { id } });

@@ -10,6 +10,8 @@ async function onboardToReview(page: Page, name: string, email: string) {
   await page.getByRole('button', { name: 'Nanny' }).click();
   await page.getByLabel('Name').fill(name);
   await page.getByLabel('Email').fill(email);
+  // Unique phone per registration (User.phone is @unique).
+  await page.getByLabel('Phone').fill(`+374${String(Date.now()).slice(-8)}`);
   await page.getByLabel('Password').fill('supersecret1');
   await page.getByRole('button', { name: 'Sign up' }).click();
   await expect(page).toHaveURL(/\/en\/nanny$/, { timeout: 15000 });

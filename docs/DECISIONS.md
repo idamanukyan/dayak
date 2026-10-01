@@ -129,3 +129,25 @@ Chronological log. Each entry: what was decided and why. See
   notification; nanny flow creates REGISTERED + interview magic link; `/id` for admins.
   Entry no-ops without `TELEGRAM_BOT_TOKEN`. Legacy Python bot in `dayak-kit/` is now
   superseded (left in place; not run).
+
+## 2026-09-30 — Phase 6 (hardening + deploy)
+
+- **Rate limiting is in-memory per instance** (`lib/rate-limit.ts`), not Redis. Fine
+  for the single-VPS model; the store is swappable for Redis to scale horizontally.
+  Limits per spec 11.7: login 5/15min per IP+email, interview 60/hr, presign 20/hr per nanny.
+- **CSP allows the S3 endpoint origin** (`connect-src`/`img-src`) — required for the
+  presigned PUT (upload) and admin thumbnail GETs. Derived from `S3_ENDPOINT` at config
+  time (dev `http://localhost:9000`, prod R2 https). Missing this blocks uploads — the
+  Phase 6 e2e caught it.
+- **CSRF via `serverActions.allowedOrigins`** — only enforced when
+  `SERVER_ACTION_ORIGINS` is set (prod), so local dev isn't broken.
+- **`output: 'standalone'` + `outputFileTracingRoot`** for a small Docker image that
+  includes workspace packages. Multi-stage `apps/web/Dockerfile`; `compose.prod.yml`
+  (postgres/redis/web/caddy + one-shot `migrate`); `Caddyfile` for auto-TLS.
+- **Backups**: `scripts/backup.sh` (pg_dump→gzip→R2, 30-day retention, cron). Admin
+  creation: `scripts/add-admin.ts`. Restore/rollback/secret-rotation/ZAP documented in
+  RUNBOOK.
+- **E2E runs serially** (`workers: 1`) — tests share one admin account and the
+  in-memory login limiter, so parallel workers contend. ~35s serially.
+- **OWASP ZAP** is documented as a manual/deploy step (needs a running HTTPS host);
+  the CSP + security headers address the common baseline High/Medium alerts.

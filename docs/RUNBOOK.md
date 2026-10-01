@@ -71,7 +71,91 @@ console logging (dev). Emails send via Resend when `RESEND_API_KEY` is set; Tele
 messages send when `TELEGRAM_BOT_TOKEN` is set and the recipient has a linked
 `telegramId` (or for the admin group when `TELEGRAM_ADMIN_CHAT_ID` is set).
 
-## Deploy / rollback / secrets / restore
+## Security hardening (Phase 6)
 
-_To be completed in Phase 6 (Hetzner + Caddy, `compose.prod.yml`, nightly
-`pg_dump` to R2, secret rotation, adding an admin)._
+- **Rate limits** (`apps/web/src/lib/rate-limit.ts`): login 5 / 15 min per IP+email;
+  interview turns 60 / hr per nanny; presign 20 / hr per nanny. In-memory per instance
+  (swap for Redis to scale horizontally).
+- **Security headers** (`next.config.mjs` → `headers()`): CSP, `X-Frame-Options: DENY`,
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`. Caddy adds
+  HSTS at the edge.
+- **CSRF**: Server Actions restricted to `SERVER_ACTION_ORIGINS` in production.
+- **File uploads**: server-side MIME sniff (`file-type`) + 10 MB cap + allowlist; ID
+  images are private, accessed only via 60 s presigned URLs, every admin view audited.
+
+## Deploy (Hetzner VPS + Docker + Caddy)
+
+Prereqs: a VPS with Docker + Docker Compose, a DNS A record pointing your domain at it.
+
+```bash
+# On the VPS, in the repo:
+cp .env.example .env      # fill EVERY value — AUTH_SECRET, POSTGRES_PASSWORD,
+                          # DAYAK_DOMAIN, SERVER_ACTION_ORIGINS, ANTHROPIC_API_KEY, etc.
+export DAYAK_DOMAIN=app.dayak.am
+
+# 1. Build + start db/redis/web/caddy
+docker compose -f compose.prod.yml up -d --build
+
+# 2. Apply migrations (the one-shot `migrate` service)
+docker compose -f compose.prod.yml run --rm migrate
+
+# 3. Seed once (first deploy only), or create an admin (below)
+#    docker compose -f compose.prod.yml exec web node ... (see "Add an admin")
+```
+
+Caddy fetches a Let's Encrypt cert for `$DAYAK_DOMAIN` automatically. Visit
+`https://$DAYAK_DOMAIN` → it should redirect to `/hy`. Health: `https://$DAYAK_DOMAIN/api/health`.
+
+The **Telegram bot** runs as a separate long-polling process (not in the web image):
+```bash
+pnpm --filter @dayak/bot start   # on the VPS or a small worker box, with TELEGRAM_BOT_TOKEN set
+```
+
+## Rollback
+
+Images are tagged by the compose build. To roll back to a previous commit:
+```bash
+git checkout <previous-good-sha>
+docker compose -f compose.prod.yml up -d --build web
+# If a migration must be reverted, restore from the latest pre-deploy backup (below).
+```
+Migrations are forward-only (`prisma migrate deploy`); for a schema rollback, restore a
+backup taken immediately before the deploy.
+
+## Secret rotation
+
+1. Generate the new value (e.g. `openssl rand -base64 32` for `AUTH_SECRET`).
+2. Update `.env` on the VPS (and your secrets manager).
+3. `docker compose -f compose.prod.yml up -d web` to restart with the new env.
+   - Rotating `AUTH_SECRET` invalidates all sessions (users re-log in) — expected.
+   - Rotating `S3_*` / `ANTHROPIC_API_KEY` / `RESEND_API_KEY` / `TELEGRAM_BOT_TOKEN`
+     takes effect on restart.
+
+## Backups & restore
+
+Nightly `pg_dump` → gzip → R2 via `scripts/backup.sh` (cron: `30 2 * * *`). Retains 30 days.
+
+Restore a backup:
+```bash
+# Download the dump from R2, then:
+gunzip -c dayak-YYYYMMDDT......Z.sql.gz | \
+  docker compose -f compose.prod.yml exec -T postgres psql -U dayak -d dayak
+```
+Test restores periodically into a scratch DB — an untested backup is not a backup.
+
+## Add an admin
+
+```bash
+# From the repo (dev or a box with source + deps):
+pnpm tsx scripts/add-admin.ts admin@dayak.am 'strong-password' "Coordinator"
+```
+Creates the user if absent, or promotes an existing user to ADMIN and resets the password.
+
+## Security scan (OWASP ZAP baseline)
+
+```bash
+docker run --rm -t ghcr.io/zaproxy/zaproxy:stable \
+  zap-baseline.py -t https://$DAYAK_DOMAIN -m 5
+```
+Target: **no High-risk findings**. The security headers + CSP above address the common
+baseline alerts (missing CSP, X-Frame-Options, clickjacking). Re-run after each deploy.

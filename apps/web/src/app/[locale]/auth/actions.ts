@@ -1,10 +1,12 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { hash } from '@node-rs/argon2';
 import { z } from 'zod';
 import { AuthError } from 'next-auth';
 import { prisma, Role, Locale } from '@dayak/db';
 import { signIn, signOut } from '@/auth';
+import { rateLimit, LIMITS } from '@/lib/rate-limit';
 
 export async function logoutAction() {
   await signOut({ redirectTo: '/' });
@@ -101,6 +103,12 @@ export async function loginAction(
   });
   if (!parsed.success) return { error: 'invalid' };
   const { email, password, locale } = parsed.data;
+
+  // Rate limit: 5 attempts / 15 min per IP + email (spec 11.7).
+  const h = await headers();
+  const ip = h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || 'unknown';
+  const rl = rateLimit(`login:${ip}:${email}`, LIMITS.login.limit, LIMITS.login.windowMs);
+  if (!rl.ok) return { error: 'rate_limited' };
 
   // Route to the right home by role.
   const user = await prisma.user.findUnique({ where: { email }, select: { role: true } });

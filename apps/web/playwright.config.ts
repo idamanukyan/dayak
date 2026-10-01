@@ -5,7 +5,10 @@ const baseURL = process.env.NEXT_PUBLIC_APP_URL ?? `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  // Serial: tests share one admin account and the in-memory login rate limiter,
+  // so parallel workers would contend on both. The suite runs in ~35s serially.
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',

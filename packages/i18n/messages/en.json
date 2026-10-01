@@ -45,7 +45,8 @@
     "continueWithGoogle": "Continue with Google",
     "haveAccount": "Already have an account?",
     "noAccount": "Don't have an account?",
-    "invalidCredentials": "Invalid email or password"
+    "invalidCredentials": "Invalid email or password",
+    "tooManyAttempts": "Too many attempts. Please wait a few minutes and try again."
   },
   "nanny": {
     "title": "Your onboarding",

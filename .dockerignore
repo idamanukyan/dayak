@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/dist
+.git
+.docker-data
+**/.env
+**/.env.local
+**/coverage
+**/test-results
+**/playwright-report
+dayak-kit/bot/.venv
+docs/demo

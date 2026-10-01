@@ -5,6 +5,7 @@ import { DocType } from '@dayak/db';
 import { requireOrCreateNanny, UnauthorizedError } from '@/lib/session';
 import { validatePresignRequest, buildDocKey, type AllowedMime } from '@/lib/uploads';
 import { ensureBucket, presignPut, PRESIGN_TTL_SECONDS } from '@/lib/s3';
+import { rateLimit, LIMITS } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -23,6 +24,15 @@ export async function POST(req: Request) {
   } catch (e) {
     if (e instanceof UnauthorizedError) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
     throw e;
+  }
+
+  // Rate limit: 20 presigns / hour per nanny (spec 11.7).
+  const rl = rateLimit(`presign:${nannyId}`, LIMITS.presign.limit, LIMITS.presign.windowMs);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: 'rate_limited' },
+      { status: 429, headers: { 'retry-after': String(rl.retryAfterSec) } },
+    );
   }
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));

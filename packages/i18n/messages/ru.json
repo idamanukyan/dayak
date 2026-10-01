@@ -45,7 +45,8 @@
     "continueWithGoogle": "Продолжить с Google",
     "haveAccount": "Уже есть аккаунт?",
     "noAccount": "Нет аккаунта?",
-    "invalidCredentials": "Неверная почта или пароль"
+    "invalidCredentials": "Неверная почта или пароль",
+    "tooManyAttempts": "Слишком много попыток. Подождите несколько минут и попробуйте снова."
   },
   "nanny": {
     "title": "Ваша анкета",
