@@ -77,8 +77,8 @@ export function Filters({ initial }: { initial: NannyFilters }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>{t('schedule')}</Label>
-        <select value={schedule} onChange={(e) => setSchedule(e.target.value)} className={selectCls}>
+        <Label htmlFor="f-schedule">{t('schedule')}</Label>
+        <select id="f-schedule" value={schedule} onChange={(e) => setSchedule(e.target.value)} className={selectCls}>
           <option value="">{t('any')}</option>
           {SCHEDULES.map((s) => (
             <option key={s} value={s}>
@@ -89,8 +89,8 @@ export function Filters({ initial }: { initial: NannyFilters }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>{t('language')}</Label>
-        <select value={language} onChange={(e) => setLanguage(e.target.value)} className={selectCls}>
+        <Label htmlFor="f-language">{t('language')}</Label>
+        <select id="f-language" value={language} onChange={(e) => setLanguage(e.target.value)} className={selectCls}>
           <option value="">{t('any')}</option>
           {LANGUAGES.map((l) => (
             <option key={l} value={l}>
@@ -101,8 +101,8 @@ export function Filters({ initial }: { initial: NannyFilters }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>{t('ageGroup')}</Label>
-        <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} className={selectCls}>
+        <Label htmlFor="f-age">{t('ageGroup')}</Label>
+        <select id="f-age" value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} className={selectCls}>
           <option value="">{t('any')}</option>
           {AGE_GROUPS.map((a) => (
             <option key={a} value={a}>
